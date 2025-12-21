@@ -1,0 +1,12 @@
+# clasp config file (contains scriptId)
+.clasp.json
+
+# clasp auth file 
+.clasprc.json
+
+# node_modules 
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
