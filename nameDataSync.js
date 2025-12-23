@@ -1,40 +1,37 @@
-const FORMID = 'xxxxxxxx'   //① GoogleフォームのID
-const ITEMNAME = '名前'                                      //② 項目のタイトル
-const SHEETNAME = '明細情報DB(設計)'                                    //③ 読み込むシート名
 
-/**
- * Googleフォームのプルダウンリストに項目を追加する
- */
+const ITEMNAME = '名前を選択してください' //Formに記載されているアイテムの表示名
+
+//Googleフォームのプルダウンリストに項目を追加する
 function AddGoogleFormsListItem() {
+  const props = PropertiesService.getScriptProperties();
+  const FORMID = props.getProperty('SUBMISSION_FORM_ID');
+  const SHEETID = props.getProperty('MASTER_DB_ID');
+  const SHEETNAME = props.getProperty('MASTER_DB_SHEETNAME');
+
   const form = FormApp.openById(FORMID)
   const items = form.getItems()
 
-  const section = choiceValues()
-  console.log(section)
+  const nameList = getNameListFromDB(SHEETID, SHEETNAME) //中継用DBから名前一覧を取得
 
-  //デバック用Google Formsの質問名と、IDを取得
   for (let i = 0; i < items.length; i++) {
-
     const item = items[i]
-    const itemName = item.getTitle()
-    const itemId = item.getId()
+    const itemName = item.getTitle() //Formのアイテムのタイトルを取得
 
-    console.log(`質問名 ${itemName}, \n質問のID ${itemId}`)
-
-    //スプレッドシートのシェアハウスDBから内容を読み取って、Formの項目を更新する。
+    //名前選択プルダウンの項目を更新する。
     if (itemName == ITEMNAME) {
-      items[i].asListItem().setChoiceValues(section)
+      items[i].asListItem().setChoiceValues(nameList)
     }
   }
 }
 
+//中継用DBからプルダウンリストの選択肢を取得する
+function getNameListFromDB(sheetID, sheetName) {
+  const ss = SpreadsheetApp.openById(sheetID);
+  const sheet = ss.getSheetByName(sheetName);
 
-//Googleシートから、プルダウンリストの選択肢を取得する
-function choiceValues() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEETNAME)
-  const lastRow = sheet.getLastRow()
-  const values = sheet.getRange(17, 2, 8, 1).getValues() //本当はここGetLastRow
-  console.log(values)
+  const lastRow = sheet.getLastRow();
+  const values = sheet.getRange(1, 1, lastRow, 1).getValues().flat(); //1列目の1行目から記入行まで読み込む
+  values.shift(); //1行目(項目)を削除
 
-  return values
+  return values.filter(v => v !== "");
 }
