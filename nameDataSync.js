@@ -1,5 +1,8 @@
+/*
+  トリガーに設定する関数：AddGoogleFormsListItem
+  トリガーの設定項目：毎週活動日の次の日の0時に更新
+*/
 
-const ITEMNAME = '名前を選択してください' //Formに記載されているアイテムの表示名
 
 //Googleフォームのプルダウンリストに項目を追加する
 function AddGoogleFormsListItem() {
@@ -7,6 +10,7 @@ function AddGoogleFormsListItem() {
   const FORMID = props.getProperty('SUBMISSION_FORM_ID');
   const SHEETID = props.getProperty('MASTER_DB_ID');
   const SHEETNAME = props.getProperty('MASTER_DB_SHEETNAME');
+  const ITEMNAME = '名前を選択してください' //Formに記載されているアイテムの表示名
 
   const form = FormApp.openById(FORMID)
   const items = form.getItems()
