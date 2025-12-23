@@ -1,15 +1,13 @@
-
-const ITEMNAME_NAME = '名前を選択してください' //Formに記載されているアイテムの表示名
-const ITEMNAME_STUDENT_NUMBER = '学籍番号' //Formに記載されているアイテムの表示名
-
 function formHandler(e) {
- const props = PropertiesService.getScriptProperties();
- const SHEETID = props.getProperty('MASTER_DB_ID');
- const SHEETNAME = props.getProperty('MASTER_DB_SHEETNAME'); 
- const LOGFOLDER = props.getProperty('LOG_FOLDER_ID'); 
- const NAMEFOLDER = props.getProperty('NAME_FOLDER_ID'); 
- const ERRORFOLDER = props.getProperty('ERROR_FOLDER_ID'); 
-
+  const props = PropertiesService.getScriptProperties();
+  const SHEETID = props.getProperty('MASTER_DB_ID');
+  const SHEETNAME = props.getProperty('MASTER_DB_SHEETNAME'); 
+  const LOGFOLDER = props.getProperty('LOG_FOLDER_ID'); 
+  const NAMEFOLDER = props.getProperty('NAME_FOLDER_ID'); 
+  const ERRORFOLDER = props.getProperty('ERROR_FOLDER_ID'); 
+  const ITEMNAME_NAME = '名前を選択してください' //Formに記載されているアイテムの表示名
+  const ITEMNAME_STUDENT_NUMBER = '学籍番号' //Formに記載されているアイテムの表示名
+  
  //フォームの回答情報を取得
  const responseItems = e.response.getItemResponses();
  let name = "";
