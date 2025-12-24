@@ -1,9 +1,3 @@
-/*
-  トリガーに設定する関数：AddGoogleFormsListItem
-  トリガーの設定項目：毎週活動日の次の日の0時に更新
-*/
-
-
 //Googleフォームのプルダウンリストに項目を追加する
 function AddGoogleFormsListItem() {
   const props = PropertiesService.getScriptProperties();
