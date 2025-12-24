@@ -8,6 +8,7 @@ function formHandler(e) {
   const ITEMNAME_STUDENT_NUMBER = '学籍番号' //Formに記載されているアイテムの表示名
   const ITEMNAME_UPLOAD = '活動費申請書(Excelファイル)を提出してください' //Formに記載されているアイテムの表示名
   const WEBHOOKURL = props.getProperty('DISCORD_WEBHOOK_URL');
+  const ROLLID = props.getProperty('DISCORD_ROLL_ID');
 
   const TIMESTAMP = Utilities.formatDate(new Date(), "JST", "yyyy/MM/dd HH:mm:ss");
     
@@ -82,7 +83,7 @@ function formHandler(e) {
       discordMsg = "【退避】原因不明のエラーが発生しました"
     }
 
-    sendDiscordNotification(discordMsg, WEBHOOKURL, name, studentNumber, TIMESTAMP);
+    sendDiscordNotification(discordMsg, WEBHOOKURL, ROLLID, name, studentNumber, TIMESTAMP);
   }
 
   //退避 or 名前フォルダにコピー
@@ -109,14 +110,14 @@ function getVerifyDataFromDB(sheetID, sheetName){
 }
 
 //Discordにエラー(退避処理)が発生したことを通知する
-function sendDiscordNotification(message, url, name, studentNumber, time) {
+function sendDiscordNotification(message, url, rollId, name, studentNumber, time) {
 
   //送るデータ
   const payload = {
     "username": "提出システム監視bot",
     "embeds": [{
       "title": message,
-      "description": "To: <@&1453259763260592232>",
+      "description": "To: <@&" + rollId + ">",
       "color": 16711680, 
       "fields": [
         { "name": "提出者", "value": name, "inline": true },
