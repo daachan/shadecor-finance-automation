@@ -10,7 +10,7 @@ function formHandler(e) {
   const WEBHOOKURL = props.getProperty('DISCORD_WEBHOOK_URL');
   const ROLLID = props.getProperty('DISCORD_ROLL_ID');
 
-  const TIMESTAMP = Utilities.formatDate(new Date(), "JST", "yyyy/MM/dd HH:mm:ss");
+  const TIMESTAMP = Utilities.formatDate(new Date(), "JST", "yyyy-MM-dd_HH-mm-ss");
     
   //コピー先DB(初期値)
   let copyTargetID = ERRORFOLDER;
@@ -20,6 +20,7 @@ function formHandler(e) {
   let name = "";
   let studentNumber = "";
   let uploadFileID = "";
+  let fileName = "error_" + TIMESTAMP + ".xlsx";
   
   responseItems.forEach(item => {
     const itemName = item.getItem().getTitle();
@@ -64,6 +65,7 @@ function formHandler(e) {
     if (isVerified) {
       console.log("verified!")
       copyTargetID = NAMEFOLDER;
+      fileName = name + "_" + TIMESTAMP + ".xlsx";
     }
     else {
       throw new Error("verify error");
@@ -89,7 +91,7 @@ function formHandler(e) {
   //退避 or 名前フォルダにコピー
   const file = DriveApp.getFileById(uploadFileID);
   const targetFolder = DriveApp.getFolderById(copyTargetID);
-  file.makeCopy(file.getName(), targetFolder);
+  file.makeCopy(fileName, targetFolder);
   console.log("copied!")
 }
 
