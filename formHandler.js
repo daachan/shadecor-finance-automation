@@ -15,12 +15,14 @@ function formHandler(e) {
   //コピー先DB(初期値)
   let copyTargetID = ERRORFOLDER;
 
+  //初期変数
+  let name = "不明";
+  let studentNumber = "不明";
+  let uploadFileID = "";
+  let fileName = "";
+
   //フォームの回答情報を取得
   const responseItems = e.response.getItemResponses();
-  let name = "";
-  let studentNumber = "";
-  let uploadFileID = "";
-  let fileName = "error_" + TIMESTAMP + ".xlsx";
   
   responseItems.forEach(item => {
     const itemName = item.getItem().getTitle();
@@ -44,8 +46,19 @@ function formHandler(e) {
     }
   });
 
+  //アップロードされたファイル情報を読み込む
+  const file = DriveApp.getFileById(uploadFileID);
+
   //DB照会処理（ここで不一致/エラーなら 退避&通知）
   try {
+    // ファイル形式チェック(.xlsxかどうかを確認)
+    const mimeType = file.getMimeType();
+    const EXCEL_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+    if (mimeType !== EXCEL_MIME) {
+      throw new Error("file type error");
+    }
+
     //中継用DBから照合情報を取得
     const verifyDB = getVerifyDataFromDB(SHEETID, SHEETNAME);
     console.log(verifyDB);
@@ -72,24 +85,31 @@ function formHandler(e) {
     }
   } 
   catch (err) {
+    //管理画面確認用
+    console.log("エラー内容" + err);
+    
+    //ファイル名はそのままで退避させる
+    fileName = file.getName();
+    
     const msg = err.message;
     let discordMsg = "";
-    
-    console.log("エラー内容" + err);
     
     //通知内容の選択
     if (msg.includes("verify error")) {
       discordMsg = "【退避】名前と学籍番号が一致しないファイルがアップロードされました"
     }
+    else if (msg.includes("file type error")) {
+      discordMsg = "【退避】Excel（.xlsx）以外のファイルがアップロードされました";
+    }
     else {
       discordMsg = "【退避】原因不明のエラーが発生しました"
     }
 
+    //Discord通知
     sendDiscordNotification(discordMsg, WEBHOOKURL, ROLLID, name, studentNumber, TIMESTAMP);
   }
 
   //退避 or 名前フォルダにコピー
-  const file = DriveApp.getFileById(uploadFileID);
   const targetFolder = DriveApp.getFolderById(copyTargetID);
   file.makeCopy(fileName, targetFolder);
   console.log("copied!")
