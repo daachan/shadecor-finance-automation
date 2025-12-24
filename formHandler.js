@@ -14,17 +14,17 @@ function formHandler(e) {
  let studentNumber = "";
  
  responseItems.forEach(item => {
-  const itemName = item.getTitle().getTitle();
+  const itemName = item.getItem().getTitle();
   
   //名前情報を取得
   if (itemName == ITEMNAME_NAME){
-    name = responseItems.getResponse();
+    name = item.getResponse();
     console.log(name);
   }
   
   //学籍番号情報を取得
   if (itemName == ITEMNAME_STUDENT_NUMBER){
-    studentNumber = responseItems.getResponse();
+    studentNumber = item.getResponse();
     console.log(studentNumber);
   }
  });
