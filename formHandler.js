@@ -7,6 +7,9 @@ function formHandler(e) {
   const ITEMNAME_NAME = '名前を選択してください' //Formに記載されているアイテムの表示名
   const ITEMNAME_STUDENT_NUMBER = '学籍番号' //Formに記載されているアイテムの表示名
   const ITEMNAME_UPLOAD = '活動費申請書(Excelファイル)を提出してください' //Formに記載されているアイテムの表示名
+  const WEBHOOKURL = props.getProperty('DISCORD_WEBHOOK_URL');
+
+  const TIMESTAMP = Utilities.formatDate(new Date(), "JST", "yyyy/MM/dd HH:mm:ss");
     
   //コピー先DB(初期値)
   let copyTargetID = ERRORFOLDER;
@@ -62,11 +65,24 @@ function formHandler(e) {
       copyTargetID = NAMEFOLDER;
     }
     else {
-      throw new Error("名前と学籍番号が一致しませんでした");
+      throw new Error("verify error");
     }
   } 
   catch (err) {
+    const msg = err.message;
+    let discordMsg = "";
+    
     console.log("エラー内容" + err);
+    
+    //通知内容の選択
+    if (msg.includes("verify error")) {
+      discordMsg = "【退避】名前と学籍番号が一致しないファイルがアップロードされました"
+    }
+    else {
+      discordMsg = "【退避】原因不明のエラーが発生しました"
+    }
+
+    sendDiscordNotification(discordMsg, WEBHOOKURL, name, studentNumber, TIMESTAMP);
   }
 
   //退避 or 名前フォルダにコピー
@@ -90,4 +106,38 @@ function getVerifyDataFromDB(sheetID, sheetName){
   });
 
   return values.filter(v => v !== "");
+}
+
+//Discordにエラー(退避処理)が発生したことを通知する
+function sendDiscordNotification(message, url, name, studentNumber, time) {
+
+  //送るデータ
+  const payload = {
+    "username": "提出システム監視bot",
+    "embeds": [{
+      "title": message,
+      "description": "To: <@&1453259763260592232>",
+      "color": 16711680, 
+      "fields": [
+        { "name": "提出者", "value": name, "inline": true },
+        { "name": "学籍番号", "value": studentNumber, "inline": true }
+      ],
+      "footer": {
+        "text": "発生時刻: " + time
+      }
+    }]
+  };
+
+  //付加情報
+  const options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload)
+  };
+
+  try {
+    UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    console.log("Discord通知に失敗しました: " + e.message);
+  }
 }
